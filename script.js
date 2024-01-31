@@ -32,7 +32,7 @@ chrome.action.onClicked.addListener((tab) => {
     chrome.scripting.executeScript({
       target: { tabId: tab.id },
       func: downloadPage,
-      args: [tab.title, tab.url],
+      args: [tab.title, decodeURI(tab.url)],
     });
     chrome.tabs.remove(tab.id);
   }
