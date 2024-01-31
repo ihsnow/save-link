@@ -1,4 +1,8 @@
 const handleClick = (tab) => {
+  if (!tab.url.startsWith("http")) {
+    return;
+  }
+
   const title = tab.title;
   const url = decodeURI(tab.url);
 
@@ -24,13 +28,13 @@ const handleClick = (tab) => {
     "href",
     "data:text/plain;charset=utf-8," + encodeURIComponent(html)
   );
-  element.setAttribute("download", tab.title + ".link.html");
+  element.setAttribute("download", tab.title + ".html");
   element.style.display = "none";
   document.body.appendChild(element);
   element.click();
-  document.body.removeChild(element);
+  // we don't have to remove the element because the page itself is going to be closed
 
   browser.tabs.remove(tab.id);
 };
 
-browser.browserAction.onClicked.addListener(handleClick);
+browser.action.onClicked.addListener(handleClick);
