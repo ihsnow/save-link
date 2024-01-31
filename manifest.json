@@ -1,28 +1,20 @@
 {
-  "manifest_version": 2,
+  "manifest_version": 3,
   "name": "Save Link",
-  "version": "1.0.0",
+  "version": "1.0.1",
 
-  "description": "Downloads a link to the current tab in a browser agnostic format and closes the tab. Inspired by \"Save a link to the current tab\" by Nathaniel M. Foley-Beaver",
+  "description": "Downloads a link to the current tab in a browser agnostic format and closes the tab",
 
-  "browser_specific_settings": {
-    "gecko": {
-      "id": "{5afe8100-0a54-439e-8197-8d94746d177c}"
-    }
-  },
+  "action": {},
 
   "icons": {
-    "48": "icon.svg",
-    "96": "icon.svg"
+    "48": "icon128.png",
+    "128": "icon512.png"
   },
 
-  "browser_action": {
-    "default_icon": "icon.svg"
-  },
-
-  "permissions": ["activeTab"],
+  "permissions": ["activeTab", "scripting"],
 
   "background": {
-    "scripts": ["script.js"]
+    "service_worker": "script.js"
   }
 }

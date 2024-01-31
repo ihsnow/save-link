@@ -1,7 +1,4 @@
-const handleClick = (tab) => {
-  const title = tab.title;
-  const url = decodeURI(tab.url);
-
+const downloadPage = (title, url) => {
   const html = `
     <!DOCTYPE html>
     <html xmlns="http://www.w3.org/1999/xhtml">
@@ -18,19 +15,25 @@ const handleClick = (tab) => {
         </body>
     </html>
     `;
-
   const element = document.createElement("a");
   element.setAttribute(
     "href",
     "data:text/plain;charset=utf-8," + encodeURIComponent(html)
   );
-  element.setAttribute("download", tab.title + ".link.html");
+  element.setAttribute("download", title + ".html");
   element.style.display = "none";
   document.body.appendChild(element);
   element.click();
-  document.body.removeChild(element);
-
-  browser.tabs.remove(tab.id);
+  // we don't have to remove the element because the page itself is going to be closed
 };
 
-browser.browserAction.onClicked.addListener(handleClick);
+chrome.action.onClicked.addListener((tab) => {
+  if (tab.url.startsWith("http")) {
+    chrome.scripting.executeScript({
+      target: { tabId: tab.id },
+      func: downloadPage,
+      args: [tab.title, tab.url],
+    });
+    chrome.tabs.remove(tab.id);
+  }
+});
