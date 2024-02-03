@@ -27,13 +27,17 @@ const downloadPage = (title, url) => {
   // we don't have to remove the element because the page itself is going to be closed
 };
 
-chrome.action.onClicked.addListener((tab) => {
+chrome.action.onClicked.addListener(async (tab) => {
   if (tab.url.startsWith("http")) {
-    chrome.scripting.executeScript({
-      target: { tabId: tab.id },
-      func: downloadPage,
-      args: [tab.title, decodeURI(tab.url)],
-    });
-    chrome.tabs.remove(tab.id);
+    try {
+      await chrome.scripting.executeScript({
+        target: { tabId: tab.id },
+        func: downloadPage,
+        args: [tab.title, decodeURI(tab.url)],
+      });
+      chrome.tabs.remove(tab.id);
+    } catch (e) {
+      console.log(e);
+    }
   }
 });
