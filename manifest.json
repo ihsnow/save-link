@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Save Link",
-  "version": "1.0.1",
+  "version": "1.0.2",
 
   "description": "Downloads a link to the current tab in a browser agnostic format and closes the tab. Inspired by \"Save a link to the current tab\" by Nathaniel M. Foley-Beaver",
 
