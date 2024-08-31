@@ -1,9 +1,9 @@
 {
   "manifest_version": 3,
   "name": "Save Link",
-  "version": "1.0.2",
+  "version": "1.1.0",
 
-  "description": "Downloads a link to the current tab in a browser agnostic format and closes the tab",
+  "description": "Downloads a link in a browser agnostic format and closes the tab. Inspired by \"Save a link to the current tab\" by Nathaniel M. Foley-Beaver",
 
   "action": {},
 
@@ -12,7 +12,7 @@
     "128": "icon512.png"
   },
 
-  "permissions": ["activeTab", "scripting"],
+  "permissions": ["activeTab", "contextMenus", "scripting"],
 
   "background": {
     "service_worker": "script.js"
