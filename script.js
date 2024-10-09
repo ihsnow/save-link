@@ -1,33 +1,50 @@
-const download = (title, url) => {
-  const getHtmlContent = (title, url) => `
-    <!DOCTYPE html>
-    <html xmlns="http://www.w3.org/1999/xhtml">
-        <head>
-            <title>${title}</title>
-            <meta http-equiv="refresh"
-                  charset="utf-8"
-                  content="0; url=${url}" />
-        </head>
-        <body>
-            <p>
-                Loading <a href="${url}">${title}</a>...
-            </p>
-        </body>
-    </html>
-    `;
+const Targets = {
+  Universal: "universal",
+  Mac: "mac",
+};
 
-  const saveHtml = (fileName, htmlContent, element) => {
+let target = Targets.Universal;
+
+const download = (title, url, target, Targets) => {
+  const getUniversal = (url) =>
+    `<!DOCTYPE html>
+  <html xmlns="http://www.w3.org/1999/xhtml">
+      <head>
+          <title>Loading...</title>
+          <meta http-equiv="refresh"
+                charset="utf-8"
+                content="0; url=${url}" />
+      </head>
+      <body>
+      </body>
+  </html>`;
+
+  const getMac = (url) =>
+    `<?xml version="1.0" encoding="UTF-8"?>
+  <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+  <plist version="1.0">
+  <dict>
+    <key>URL</key>
+    <string>${url}</string>
+  </dict>
+  </plist>`;
+  const getHtmlContentAndExt = (url) =>
+    target === Targets.Universal
+      ? { content: getUniversal(url), ext: "html" }
+      : { content: getMac(url), ext: "webloc" };
+
+  const saveHtml = (fileName, content, ext, element) => {
     element.setAttribute(
       "href",
-      "data:text/plain;charset=utf-8," + encodeURIComponent(htmlContent)
+      "data:text/plain;charset=utf-8," + encodeURIComponent(content)
     );
-    element.setAttribute("download", fileName + ".html");
+    element.setAttribute("download", fileName + "." + ext);
     element.click();
   };
 
   const element = document.createElement("a");
-  const htmlContent = getHtmlContent(title, url);
-  saveHtml(title, htmlContent, element);
+  const { content, ext } = getHtmlContentAndExt(url);
+  saveHtml(title, content, ext, element);
 };
 
 const processLink = async (title, url, tabId, closeTab) => {
@@ -38,7 +55,7 @@ const processLink = async (title, url, tabId, closeTab) => {
     await chrome.scripting.executeScript({
       target: { tabId },
       func: download,
-      args: [title, url],
+      args: [title, url, target, Targets],
     });
     if (closeTab) {
       chrome.tabs.remove(tabId);
@@ -62,3 +79,9 @@ chrome.contextMenus.create({
   title: "Save this link",
   contexts: ["link"],
 });
+
+chrome.storage.local.onChanged.addListener((changes) => {
+  target = changes.target.newValue;
+});
+
+chrome.storage.local.set({ target });
