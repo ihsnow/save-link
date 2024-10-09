@@ -1,28 +1,46 @@
+const Targets = {
+  Universal: "universal",
+  Mac: "mac",
+};
+
 const element = document.createElement("a");
 
-const getHtmlContent = (title, url) => `
-    <!DOCTYPE html>
-    <html xmlns="http://www.w3.org/1999/xhtml">
-        <head>
-            <title>${title}</title>
-            <meta http-equiv="refresh"
-                  charset="utf-8"
-                  content="0; url=${url}" />
-        </head>
-        <body>
-            <p>
-                Loading <a href="${url}">${title}</a>...
-            </p>
-        </body>
-    </html>
-    `;
+let target = Targets.Universal;
 
-const saveHtml = (fileName, htmlContent) => {
+const getUniversal = (url) =>
+  `<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>Loading...</title>
+        <meta http-equiv="refresh"
+              charset="utf-8"
+              content="0; url=${url}" />
+    </head>
+    <body>
+    </body>
+</html>`;
+
+const getMac = (url) =>
+  `<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>URL</key>
+	<string>${url}</string>
+</dict>
+</plist>`;
+
+const getHtmlContentAndExt = (url) =>
+  target === Targets.Universal
+    ? { content: getUniversal(url), ext: "html" }
+    : { content: getMac(url), ext: "webloc" };
+
+const saveHtml = (fileName, content, ext) => {
   element.setAttribute(
     "href",
-    "data:text/plain;charset=utf-8," + encodeURIComponent(htmlContent)
+    "data:text/plain;charset=utf-8," + encodeURIComponent(content)
   );
-  element.setAttribute("download", fileName + ".html");
+  element.setAttribute("download", fileName + "." + ext);
   element.click();
   element.removeAttribute("href");
   element.removeAttribute("download");
@@ -33,8 +51,8 @@ const processLink = (title, url, tabId, closeTab) => {
     return;
   }
   try {
-    const htmlContent = getHtmlContent(title, url);
-    saveHtml(title, htmlContent);
+    const { content, ext } = getHtmlContentAndExt(url);
+    saveHtml(title, content, ext);
     if (closeTab) {
       browser.tabs.remove(tabId);
     }
@@ -56,3 +74,9 @@ browser.contextMenus.create({
   title: "Save this link",
   contexts: ["link"],
 });
+
+browser.storage.local.onChanged.addListener((changes) => {
+  target = changes.target.newValue;
+});
+
+browser.storage.local.set({ target });
