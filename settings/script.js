@@ -6,10 +6,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
-  document.forms[0].onsubmit = function handleSubmit(event) {
-    event.preventDefault();
-    const formData = new FormData(event.target);
-    const formProps = Object.fromEntries(formData);
-    chrome.storage.local.set(formProps);
-  };
+  document.querySelectorAll('input[name="target"').forEach((radio) => {
+    radio.onclick = (e) => chrome.storage.local.set({ target: e.target.id });
+  });
 });

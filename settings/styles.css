@@ -1,3 +1,73 @@
-button {
-  margin-top: 10px;
+*,
+*:before,
+*:after {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, system-ui, "Segoe UI", Helvetica, Arial,
+    sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  font-size: 15px;
+  height: 120px;
+}
+
+fieldset {
+  margin: 10px;
+}
+
+legend {
+  padding: 5px;
+}
+
+.radio + .radio {
+  margin-top: 8px;
+}
+
+.radio > input {
+  display: none;
+}
+
+.radio > span {
+  display: inline-block;
+  position: relative;
+  padding-left: 30px;
+}
+
+.radio > span:before {
+  content: "";
+  display: block;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  border-radius: 50%;
+  margin-right: 5px;
+  width: 16px;
+  height: 16px;
+  border: 1px solid #ccc;
+  background: #fff;
+}
+
+.radio > span:after {
+  content: "";
+  display: block;
+  width: 10px;
+  height: 10px;
+  background: #222;
+  position: absolute;
+  border-radius: 50%;
+  top: 3px;
+  left: 3px;
+  opacity: 0;
+  transition: all 0.1s cubic-bezier(0.64, 0.57, 0.67, 1.53);
+}
+
+.radio > input:checked + span:after {
+  opacity: 1;
+}
+
+.radio {
+  display: block;
+  cursor: pointer;
+  user-select: none;
+  text-align: left;
 }

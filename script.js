@@ -3,7 +3,7 @@ const Targets = {
   Mac: "mac",
 };
 
-let target = Targets.Universal;
+let target;
 
 const download = (title, url, target, Targets) => {
   const getUniversal = (url) =>
@@ -87,7 +87,9 @@ chrome.storage.local.onChanged.addListener((changes) => {
 });
 
 chrome.storage.local.get(null, (options) => {
-  if (!options.target) {
-    chrome.storage.local.set({ target });
+  if (options.target) {
+    target = options.target;
+  } else {
+    chrome.storage.local.set({ target: Targets.Universal });
   }
 });
