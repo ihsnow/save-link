@@ -5,7 +5,7 @@ const Targets = {
 
 const element = document.createElement("a");
 
-let target = Targets.Universal;
+let target;
 
 const getUniversal = (url) =>
   `<!DOCTYPE html>
@@ -82,7 +82,9 @@ browser.storage.local.onChanged.addListener((changes) => {
 });
 
 browser.storage.local.get(null, (options) => {
-  if (!options.target) {
-    browser.storage.local.set({ target });
+  if (options.target) {
+    target = options.target;
+  } else {
+    browser.storage.local.set({ target: Targets.Universal });
   }
 });
