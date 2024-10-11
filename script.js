@@ -69,14 +69,20 @@ browser.contextMenus.onClicked.addListener(({ linkText, linkUrl }, { id }) =>
   processLink(linkText, decodeURI(linkUrl), id)
 );
 
-browser.contextMenus.create({
-  id: "save-link",
-  title: "Save this link",
-  contexts: ["link"],
+browser.contextMenus.removeAll().then(() => {
+  browser.contextMenus.create({
+    id: "save-link",
+    title: "Save this link",
+    contexts: ["link"],
+  });
 });
 
 browser.storage.local.onChanged.addListener((changes) => {
   target = changes.target.newValue;
 });
 
-browser.storage.local.set({ target });
+browser.storage.local.get(null, (options) => {
+  if (!options.target) {
+    browser.storage.local.set({ target });
+  }
+});
