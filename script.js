@@ -8,26 +8,26 @@ let target = Targets.Universal;
 const download = (title, url, target, Targets) => {
   const getUniversal = (url) =>
     `<!DOCTYPE html>
-  <html xmlns="http://www.w3.org/1999/xhtml">
-      <head>
-          <title>Loading...</title>
-          <meta http-equiv="refresh"
-                charset="utf-8"
-                content="0; url=${url}" />
-      </head>
-      <body>
-      </body>
-  </html>`;
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>Loading...</title>
+        <meta http-equiv="refresh"
+              charset="utf-8"
+              content="0; url=${url}" />
+    </head>
+    <body>
+    </body>
+</html>`;
 
   const getMac = (url) =>
     `<?xml version="1.0" encoding="UTF-8"?>
-  <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-  <plist version="1.0">
-  <dict>
-    <key>URL</key>
-    <string>${url}</string>
-  </dict>
-  </plist>`;
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>URL</key>
+  <string>${url}</string>
+</dict>
+</plist>`;
   const getHtmlContentAndExt = (url) =>
     target === Targets.Universal
       ? { content: getUniversal(url), ext: "html" }
@@ -74,14 +74,20 @@ chrome.contextMenus.onClicked.addListener(
     processLink(selectionText, decodeURI(linkUrl), id)
 );
 
-chrome.contextMenus.create({
-  id: "save-link",
-  title: "Save this link",
-  contexts: ["link"],
+chrome.contextMenus.removeAll().then(() => {
+  chrome.contextMenus.create({
+    id: "save-link",
+    title: "Save this link",
+    contexts: ["link"],
+  });
 });
 
 chrome.storage.local.onChanged.addListener((changes) => {
   target = changes.target.newValue;
 });
 
-chrome.storage.local.set({ target });
+chrome.storage.local.get(null, (options) => {
+  if (!options.target) {
+    chrome.storage.local.set({ target });
+  }
+});
