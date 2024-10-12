@@ -25,7 +25,7 @@ const download = (title, url, target, Targets) => {
 <plist version="1.0">
 <dict>
   <key>URL</key>
-  <string>${url}</string>
+  <string>${url.replace(/&/g, "&amp;")}</string>
 </dict>
 </plist>`;
   const getHtmlContentAndExt = (url) =>
