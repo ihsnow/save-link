@@ -1,12 +1,5 @@
-const Targets = {
-  Universal: "universal",
-  Mac: "mac",
-};
-
-let target;
-
-const download = (title, url, target, Targets) => {
-  const getUniversal = (url) =>
+const download = (title, url) => {
+  const getContent = (url) =>
     `<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
     <head>
@@ -19,20 +12,6 @@ const download = (title, url, target, Targets) => {
     </body>
 </html>`;
 
-  const getMac = (url) =>
-    `<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-  <key>URL</key>
-  <string>${url.replace(/&/g, "&amp;")}</string>
-</dict>
-</plist>`;
-  const getHtmlContentAndExt = (url) =>
-    target === Targets.Universal
-      ? { content: getUniversal(url), ext: "html" }
-      : { content: getMac(url), ext: "webloc" };
-
   const saveHtml = (fileName, content, ext, element) => {
     element.setAttribute(
       "href",
@@ -43,8 +22,7 @@ const download = (title, url, target, Targets) => {
   };
 
   const element = document.createElement("a");
-  const { content, ext } = getHtmlContentAndExt(url);
-  saveHtml(title, content, ext, element);
+  saveHtml(title, getContent(url), "html", element);
 };
 
 const processLink = async (title, url, tabId, closeTab) => {
@@ -55,7 +33,7 @@ const processLink = async (title, url, tabId, closeTab) => {
     await chrome.scripting.executeScript({
       target: { tabId },
       func: download,
-      args: [title, url, target, Targets],
+      args: [title, url],
     });
     if (closeTab) {
       chrome.tabs.remove(tabId);
@@ -80,16 +58,4 @@ chrome.contextMenus.removeAll().then(() => {
     title: "Save this link",
     contexts: ["link"],
   });
-});
-
-chrome.storage.local.onChanged.addListener((changes) => {
-  target = changes.target.newValue;
-});
-
-chrome.storage.local.get(null, (options) => {
-  if (options.target) {
-    target = options.target;
-  } else {
-    chrome.storage.local.set({ target: Targets.Universal });
-  }
 });
