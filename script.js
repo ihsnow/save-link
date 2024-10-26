@@ -1,13 +1,6 @@
-const Targets = {
-  Universal: "universal",
-  Mac: "mac",
-};
-
 const element = document.createElement("a");
 
-let target;
-
-const getUniversal = (url) =>
+const getContent = (url) =>
   `<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
     <head>
@@ -19,21 +12,6 @@ const getUniversal = (url) =>
     <body>
     </body>
 </html>`;
-
-const getMac = (url) =>
-  `<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-	<key>URL</key>
-	<string>${url.replace(/&/g, "&amp;")}</string>
-</dict>
-</plist>`;
-
-const getHtmlContentAndExt = (url) =>
-  target === Targets.Universal
-    ? { content: getUniversal(url), ext: "html" }
-    : { content: getMac(url), ext: "webloc" };
 
 const saveHtml = (fileName, content, ext) => {
   element.setAttribute(
@@ -51,8 +29,7 @@ const processLink = (title, url, tabId, closeTab) => {
     return;
   }
   try {
-    const { content, ext } = getHtmlContentAndExt(url);
-    saveHtml(title, content, ext);
+    saveHtml(title, getContent(url), "html");
     if (closeTab) {
       browser.tabs.remove(tabId);
     }
@@ -64,7 +41,6 @@ const processLink = (title, url, tabId, closeTab) => {
 browser.action.onClicked.addListener((tab) =>
   processLink(tab.title, decodeURI(tab.url), tab.id, true)
 );
-
 browser.contextMenus.onClicked.addListener(({ linkText, linkUrl }, { id }) =>
   processLink(linkText, decodeURI(linkUrl), id)
 );
@@ -75,16 +51,4 @@ browser.contextMenus.removeAll().then(() => {
     title: "Save this link",
     contexts: ["link"],
   });
-});
-
-browser.storage.local.onChanged.addListener((changes) => {
-  target = changes.target.newValue;
-});
-
-browser.storage.local.get(null, (options) => {
-  if (options.target) {
-    target = options.target;
-  } else {
-    browser.storage.local.set({ target: Targets.Universal });
-  }
 });
